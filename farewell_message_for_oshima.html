@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大島さん、ありがとう！</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            /* 背景色は提供された画像の空の色を参考に設定 */
+            background-color: #e6f4fd; 
+            color: #333;
+        }
+
+        /* スクロール時のポップアニメーション */
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.8) translateY(30px); }
+            60% { opacity: 1; transform: scale(1.03) translateY(-5px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .message-bubble {
+            opacity: 0;
+        }
+        .message-bubble.visible {
+            animation: popIn 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        /* FUNプログラム風の装飾バブル */
+        @keyframes popOut {
+            0% { transform: translate(0, 0) scale(0); opacity: 0; }
+            60% { transform: translate(var(--tx), calc(var(--ty) - 15px)) scale(1.1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 1; }
+        }
+
+        @keyframes floatAfter {
+            0%, 100% { transform: translate(var(--tx), var(--ty)); }
+            50% { transform: translate(var(--tx), calc(var(--ty) - 10px)); }
+        }
+
+        @keyframes presentShake {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            10%, 30% { transform: rotate(-10deg) scale(1.1); }
+            20%, 40% { transform: rotate(10deg) scale(1.1); }
+            50% { transform: rotate(0deg) scale(1.1); }
+            60% { transform: rotate(0deg) scale(1); }
+        }
+
+        .fun-bubble {
+            position: absolute;
+            bottom: 0; 
+            left: 50%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+            opacity: 0;
+            margin-left: calc(var(--size) / -2);
+            margin-bottom: calc(var(--size) / -2);
+            width: var(--size);
+            height: var(--size);
+            font-size: var(--fs);
+            
+            animation: 
+                popOut 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards var(--delay),
+                floatAfter 3s ease-in-out infinite calc(var(--delay) + 0.8s);
+        }
+        
+        /* 柔らかいトーンに変更（パステルカラー） */
+        .fun-pink { background: linear-gradient(135deg, #ffc2d1, #ff9eb5); color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .fun-yellow { background: linear-gradient(135deg, #ffeba1, #ffd659); color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .fun-blue { background: linear-gradient(135deg, #c2e0ff, #99caff); color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .fun-green { background: linear-gradient(135deg, #c2f0c2, #99e699); color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+
+        .present-box {
+            animation: presentShake 1.5s ease-in-out forwards;
+            transform-origin: bottom center;
+        }
+
+        /* 吹き出しのしっぽ（左） */
+        .bubble-left {
+            position: relative;
+            border-radius: 1.5rem 1.5rem 1.5rem 0;
+        }
+        .bubble-left::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: -8px;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-bottom-right-radius: 16px;
+            z-index: -1;
+        }
+
+        /* 吹き出しのしっぽ（右） */
+        .bubble-right {
+            position: relative;
+            border-radius: 1.5rem 1.5rem 0 1.5rem;
+        }
+        .bubble-right::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: -8px;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-bottom-left-radius: 16px;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+    <!-- スマホ向けの中央配置コンテナ -->
+    <main class="max-w-md mx-auto bg-[#e6f4fd] min-h-screen relative shadow-2xl overflow-hidden pb-12">
+        
+        <!-- ヘッダー・ヒーロー画像セクション -->
+        <header class="w-full relative bg-[#e6f4fd] pt-6 pb-8">
+            
+            <!-- 画像とプレゼントBOX、モニュメント -->
+            <div class="relative w-full px-6 mx-auto z-10">
+                <img src="image_6ecb81.jpg" alt="" class="w-full h-auto rounded-xl shadow-md object-cover relative z-0 border-2 border-white/50" onerror="this.src='https://placehold.co/800x450/e6f4fd/e6f4fd?text=+'">
+                
+                <!-- プレゼントBox -->
+                <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 z-30 drop-shadow-md present-box">
+                    <svg width="60" height="60" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 箱の下部 -->
+                        <rect x="14" y="28" width="36" height="32" rx="4" fill="#ffeba1" />
+                        <!-- 縦のリボン -->
+                        <rect x="26" y="28" width="12" height="32" fill="#ffb3c6" />
+                        <!-- 箱のフタ -->
+                        <rect x="10" y="18" width="44" height="12" rx="3" fill="#fff4c2" />
+                        <!-- フタ部分の縦リボン -->
+                        <rect x="26" y="18" width="12" height="12" fill="#ff9eb5" />
+                        <!-- リボン結び目（左） -->
+                        <path d="M 32 18 C 18 4, 8 16, 28 18 Z" fill="#ff9eb5" />
+                        <!-- リボン結び目（右） -->
+                        <path d="M 32 18 C 46 4, 56 16, 36 18 Z" fill="#ff9eb5" />
+                    </svg>
+                </div>
+
+                <!-- FUNバブル装飾 -->
+                <div class="fun-bubble fun-pink" style="--tx: -70px; --ty: -180px; --size: 75px; --delay: 0.1s; --fs: 1.3rem;">FuN</div>
+                <div class="fun-bubble fun-green" style="--tx: 70px; --ty: -210px; --size: 95px; --delay: 0.3s; --fs: 1.6rem;">FUN</div>
+                <div class="fun-bubble fun-yellow" style="--tx: -110px; --ty: -90px; --size: 60px; --delay: 0.5s; --fs: 1rem;">FuN</div>
+                <div class="fun-bubble fun-yellow" style="--tx: 10px; --ty: -120px; --size: 65px; --delay: 0.2s; --fs: 1.1rem;">FUN</div>
+                <div class="fun-bubble fun-blue" style="--tx: 90px; --ty: -70px; --size: 55px; --delay: 0.4s; --fs: 0.95rem;">FUN</div>
+            </div>
+        </header>
+
+        <!-- タイトル -->
+        <div class="text-center mt-6 mb-8 px-4 relative z-10">
+            <h2 class="text-2xl font-bold text-[#004098] mb-2 tracking-wider">
+                大島さんへ
+            </h2>
+            <p class="text-sm text-gray-600 font-medium leading-relaxed">ビジネスGより<br>2026/10/22</p>
+        </div>
+
+        <!-- トーク画面コンテナ -->
+        <div class="px-4 space-y-6" id="chat-container">
+            
+            <!-- メッセージ 1 (左) -->
+            <div class="flex items-end space-x-2 message-bubble">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-pink-400 flex items-center justify-center text-white font-bold shadow text-sm">
+                    くどう
+                </div>
+                <div class="max-w-[75%]">
+                    
+                    <div class="bg-white p-3 shadow-sm bubble-left text-sm leading-relaxed">
+                        大島さんは、いつも穏やかに落ち着いていながらも、内に秘めた情熱を感じていました！一緒に働けてとても楽しかったです！何か困ったことがあれば、いつでもご連絡くださいね！これからもよろしくお願いします！
+                    </div>
+                </div>
+            </div>
+
+            <!-- メッセージ 2 (右) -->
+            <div class="flex items-end space-x-2 flex-row-reverse space-x-reverse message-bubble">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow text-sm">
+                    おぎた
+                </div>
+                <div class="max-w-[75%] flex flex-col items-end">
+                    
+                    <div class="bg-white p-3 shadow-sm bubble-right text-sm leading-relaxed">
+                        デジ戦での勤務、お疲れさまでした！グループ長が代わり、メンバーが減り、グループが変わり、そして今度は部署異動とめまぐるしく環境が変化していますが、その分成長できるチャンスだと思います。ぜひリーダーシップを発揮してCX向上を実現してください！またランチにでも行きましょう。
+                    </div>
+                </div>
+            </div>
+
+            <!-- メッセージ 3 (左) -->
+            <div class="flex items-end space-x-2 message-bubble">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-400 flex items-center justify-center text-white font-bold shadow text-sm">
+                    あかぎ
+                </div>
+                <div class="max-w-[75%]">
+                    
+                    <div class="bg-white p-3 shadow-sm bubble-left text-sm leading-relaxed">
+                        穏やかでいつも冷静沈着。素直でまじめ。そんな大島くんと一緒に仕事ができて、とても心強かったし、いつも頼りにしていました！ずっとついてきてくれて、ありがとう！これからは、いろんな人を巻き込みながらどんどん引っ張っていってください！楽しく、前向きに、がんばって！またランチいきましょう♬
+                    </div>
+                </div>
+            </div>
+
+            <!-- メッセージ 4 (右) -->
+            <div class="flex items-end space-x-2 flex-row-reverse space-x-reverse message-bubble">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-white font-bold shadow text-sm">
+                    さいとう
+                </div>
+                <div class="max-w-[75%] flex flex-col items-end">
+                    
+                    <div class="bg-white p-3 shadow-sm bubble-right text-sm leading-relaxed">
+                        大島さんの周りにはいつも独特の落ち着きオーラがあって、近くのお席になってからもそのイメージは変わらず、甘いものトークや劇団四季、昔のハモネプネタ、現在のアカペラ事情など興味津々の雑談トークが楽しかったです。異動後も近くのお席なので、またちょこちょこお話させてください！
+                    </div>
+                </div>
+            </div>
+
+            <!-- メッセージ 5 (左) -->
+            <div class="flex items-end space-x-2 message-bubble">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold shadow text-sm">
+                    にしだ
+                </div>
+                <div class="max-w-[75%]">
+                    
+                    <div class="bg-white p-3 shadow-sm bubble-left text-sm leading-relaxed">
+                        大島さん、デジ戦での活動お疲れ様でした！<br>
+                        未経験分野だと気いましたが、赤木さんやモンラボさんから考え方・進め方吸収し、また積極的に質問・相談する姿勢があったのでとても成長したと思います。<br>
+                        今ではTDメンバー1人でプロダクト開発を回せるようになりすごいです。<br>
+                        これから運用チームでアプリの盛り上げに直接関わることは、開発目線がメインのときよりもさらにステップアップできるので、頑張ってください！<br>
+                        応援しています！！！
+                    </div>
+                </div>
+            </div>
+
+            <!-- メッセージ 6 (右) -->
+            <div class="flex items-end space-x-2 flex-row-reverse space-x-reverse message-bubble">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-400 flex items-center justify-center text-white font-bold shadow text-sm">
+                    みやま
+                </div>
+                <div class="max-w-[75%] flex flex-col items-end">
+                    
+                    <div class="bg-white p-3 shadow-sm bubble-right text-sm leading-relaxed">
+                        安定感抜群の低音ボイサー大島くん<br>
+                        仕事もプライベートも変化が続くと思いますが、持ち前の安定感で楽しんでください！<br>
+                        デジ戦の期間は短かったですが引き続き関わることも多いと思います。<br>
+                        席替え程度の感覚でいるので気軽に話しかけてください！<br>
+                        マーケでの活躍を陰ながら応援しております！
+                    </div>
+                </div>
+            </div>
+
+            <!-- メッセージ 7 (左) -->
+            <div class="flex items-end space-x-2 message-bubble">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-400 flex items-center justify-center text-white font-bold shadow text-sm">
+                    たかだ
+                </div>
+                <div class="max-w-[75%]">
+                    
+                    <div class="bg-white p-3 shadow-sm bubble-left text-sm leading-relaxed">
+                        今までありがとうございました！短い期間だったけど、一緒にコンビニ万引きの体験に行ったり、謎制作をしたりと、楽しい思い出がたくさんできました！<br>
+                        大島くんはいい意味でこだわりがあって、プロダクトに愛を込めているのがすごく伝わっていました。とても素晴らしいことと思います。<br>
+                        マーケでも引き続き、そのこだわりで良いアプリを作っていってください！応援しています！落ち着いたらカラオケでも行きましょう🎤✨
+                    </div>
+                </div>
+            </div>
+
+            <!-- メッセージ 8 (右) -->
+            <div class="flex items-end space-x-2 flex-row-reverse space-x-reverse message-bubble">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold shadow text-sm">
+                    よしおか
+                </div>
+                <div class="max-w-[75%] flex flex-col items-end">
+                    
+                    <div class="bg-white p-3 shadow-sm bubble-right text-sm leading-relaxed">
+                        デジタル戦略部の仕事、本当にお疲れ様でした。<br>
+                        大島くんは芯のある優しい男だと思っています。<br>
+                        僕らがキャスト時代に大切にしていたSCSE（Four Keys）は、今の仕事では最初のSがセキュリティに変わっているだけだと思っています。<br>
+                        アプリ開発で周りに気遣いしながらプロジェクトを進める姿を見て、僕も大島くんのように常にCourtesyを忘れない人になろうと陰ながら刺激をもらっていました。<br>
+                        マーケに行っても大島くんらしく、たくさんのハピネスを届けてください。<br>
+                        僕に出来ることがあれば何でも協力します。<br>
+                        またむさっしーとキャスト飲みしようね！<br>
+                        いってらっしゃい！
+                    </div>
+                </div>
+            </div>
+
+            <!-- メッセージ 9 (左) -->
+            <div class="flex items-end space-x-2 message-bubble">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center text-white font-bold shadow text-sm">
+                    のむら
+                </div>
+                <div class="max-w-[75%]">
+                    
+                    <div class="bg-white p-3 shadow-sm bubble-left text-sm leading-relaxed">
+                        年齢も趣味も近かったので、グループから離れてしまったのはとても寂しいです、、<br>
+                        葉月さんが異動されてから大変なことも多かったと思うけど、外から見ていて大島くんは動じない、落ち着きのある印象でした。内心は焦りもあったかもですが、そう見えてました！この印象は仕事において本当に大きな武器だと思います、マーケでも自信を持って頑張ってください🌷電子チケット、AI、田中としき、社内でのコネクションとか、、協力してほしいことがあればなんなり相談してください！
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- フッター装飾 -->
+        <div class="mt-12 text-center pb-8 opacity-70">
+            <div class="flex justify-center space-x-2 mb-2">
+                <div class="w-3 h-3 rounded-full bg-blue-400"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                <div class="w-3 h-3 rounded-full bg-red-400"></div>
+            </div>
+            <p class="text-xs text-gray-500 font-bold">Good luck in your new chapter!</p>
+        </div>
+
+    </main>
+
+    <script>
+        // スクロール時に要素をフェードインさせるためのIntersection Observer
+        document.addEventListener('DOMContentLoaded', () => {
+            const bubbles = document.querySelectorAll('.message-bubble');
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        // 少しずつ遅延させて表示させることで、連続して表示される際のリズムを作る
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, index * 100); // 100msずつズラす
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            bubbles.forEach(bubble => {
+                observer.observe(bubble);
+            });
+        });
+    </script>
+</body>
+</html>
